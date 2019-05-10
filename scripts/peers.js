@@ -17,35 +17,37 @@ dbString = dbString + '@' + settings.dbsettings.address;
 dbString = dbString + ':' + settings.dbsettings.port;
 dbString = dbString + '/' + settings.dbsettings.database;
 
-mongoose.connect(dbString, function(err) {
+mongoose.connect(dbString, { useNewUrlParser: true }, function (err) {
   if (err) {
     console.log('Unable to connect to database: %s', dbString);
     console.log('Aborting');
     exit();
   } else {
-    request({uri: 'http://127.0.0.1:' + settings.port + '/api/getpeerinfo', json: true}, function (error, response, body) {
+    request({ uri: 'http://127.0.0.1:' + settings.port + '/api/getpeerinfo', json: true }, function (error, response, body) {
       lib.syncLoop(body.length, function (loop) {
         var i = loop.iteration();
         var address = body[i].addr.split(':')[0];
-        db.find_peer(address, function(peer) {
+        db.find_peer(address, function (peer) {
           if (peer) {
             // peer already exists
             loop.next();
           } else {
-            request({uri: 'http://freegeoip.net/json/' + address, json: true}, function (error, response, geo) {
+            request({ uri: 'http://api.ipstack.com/' + address + '?access_key=' + settings.peers.ipstack_api_key, json: true }, function (error, response, geo) {
               db.create_peer({
                 address: address,
                 protocol: body[i].version,
                 version: body[i].subver.replace('/', '').replace('/', ''),
                 country: geo.country_name
-              }, function(){
+              }, function () {
                 loop.next();
               });
             });
           }
         });
-      }, function() {
-        exit();
+      }, function () {
+        db.update_cronjob_run(settings.coin, { list_network_update: Math.floor(new Date() / 1000) }, function (cb) {
+          exit();
+        });
       });
     });
   }

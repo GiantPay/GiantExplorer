@@ -5,15 +5,19 @@
 */
 {
   // name your instance!
-  "title": "IQUIDUS",
+  "title": "DSTRA Block Explorer",
 
   "address": "127.0.0.1:3001",
 
   // coin name
-  "coin": "Darkcoin",
+  "coin": "DSTRA",
 
   // coin symbol
-  "symbol": "DRK",
+  "symbol": "DST",
+
+  // language settings
+  "languages" : ["us"],
+  "language_fallback" : "us",
 
   // logo
   "logo": "/images/logo.png",
@@ -26,15 +30,15 @@
   //     Cerulean, Cosmo, Cyborg, Darkly, Flatly, Journal, Lumen, Paper,
   //     Readable, Sandstone, Simplex, Slate, Spacelab, Superhero, United, Yeti
   // theme (see /public/themes for available themes)
-  "theme": "Cyborg",
+  "theme": "Sandstone",
 
   // port to listen for requests on.
   "port" : 3001,
 
   // database settings (MongoDB)
   "dbsettings": {
-    "user": "iquidus",
-    "password": "3xp!0reR",
+    "user": "diquidus",
+    "password": "dstra",
     "database": "explorerdb",
     "address": "localhost",
     "port": 27017
@@ -47,13 +51,13 @@
   // wallet settings
   "wallet": {
     "host": "localhost",
-    "port": 9332,
-    "user": "darkcoinrpc",
-    "pass": "123gfjk3R3pCCVjHtbRde2s5kzdf233sa"
+    "port": 5270,
+    "user": "dstrauser",
+    "pass": "dstrapwd"
   },
 
   // confirmations
-  "confirmations": 40,
+  "confirmations": 6,
 
   // language settings
   "locale": "locale/en.json",
@@ -64,38 +68,45 @@
     "markets": true,
     "richlist": true,
     "twitter": true,
-    "facebook": false,
+    "facebook": true,
     "googleplus": false,
+    "bitcointalk": true,
+    "website": true,
+    "slack": false,
+    "github": true,
     "search": true,
     "movement": true,
-    "network": true
+    "network": true,
+	"masternodes":true
   },
 
   // index page (valid options for difficulty are POW, POS or Hybrid)
   "index": {
     "show_hashrate": true,
-    "difficulty": "POW",
+    "difficulty": "POS",
     "last_txs": 100
   },
 
   // ensure links on API page are valid
   "api": {
-    "blockindex": 1337,
-    "blockhash": "1733320247b15ca2262be646397d1ffd6be953fa638ebb8f5dcbb4c2b91b34f1",
-    "txhash": "f270cd3813254c9922a2e222a56ba745842d9112223a1394062e460b33d27b7e",
-    "address": "RBiXWscC63Jdn1GfDtRj8hgv4Q6Zppvpwb"
+    "blockindex": 62,
+    "blockhash": "00000000365059eaded26a2676d94376d45499d4a69aea3442efe5a332728fcc ",
+    "txhash": "c98754b2a5b5cddf10103c1701f448a53c81031c6afbdd0658ca74bd56e7ed57",
+    "address": "DR6DPEkZADq4jB3kGY4wrpGnQfxkEPSHwx"
   },
 
   // market settings
-  //supported markets: bittrex, poloniex, yobit, empoex, bleutrade, cryptopia, ccex
+  //supported markets: bittrex, poloniex, yobit, empoex, bleutrade, cryptopia, ccex, coinexchange, gravix
+  //                   crex
   //default market is loaded by default and determines last price in header
   "markets": {
-    "coin": "JBS",
+    "coin": "DST",
     "exchange": "BTC",
-    "enabled": ["bittrex"],
-    "cryptopia_id": "1658",
+    "enabled": ["crex"],
+    "cryptopia_id": "2186",
     "ccex_key" : "Get-Your-Own-Key",
-    "default": "bittrex"
+    "coinexchange_id": "18",
+    "default": "crex"
   },
 
   // richlist/top100 settings
@@ -104,6 +115,7 @@
     "received": true,
     "balance": true
   },
+
   // movement page settings
   // min amount: show transactions greater than this value
   // low flag: greater than this value flagged yellow
@@ -114,14 +126,24 @@
     "high_flag": 5000
   },
 
-  // twitter, facebook, googleplus
-  "twitter": "iquidus",
-  "facebook": "yourfacebookpage",
+  // Peers page settings
+  // ipstack_api_key: ipstack.com Geo IP. This is the replacement of http://freegeoip.net You need an API Key for the Requests
+  "peers": {
+    "ipstack_api_key": "your_api_key_here"
+  },
+
+  // twitter, facebook, googleplus, bitcointalk, github, slack, website
+  "twitter": "dstra_io",
+  "facebook": "dstra.io",
   "googleplus": "yourgooglepluspage",
+  "bitcointalk": "3922106.0",
+  "github": "DSTRACoin",
+  "slack": "yourfullslackinviteurl",
+  "website": "https://dstra.io",
 
   //genesis
-  "genesis_tx": "65f705d2f385dc85763a317b3ec000063003d6b039546af5d8195a5ec27ae410",
-  "genesis_block": "b2926a56ca64e0cd2430347e383f63ad7092f406088b9b86d6d68c2a34baef51",
+  "genesis_tx": "bc9d7507709a1941c27f8e426c1ab5bfb1c14579c09a8052be1658997b778966",
+  "genesis_block": "000000d280fd2dcad5c440a9e444a599a9074e15fa3588921f5a81e192e358f7",
 
   //heavy (enable/disable additional heavy features)
   "heavy": false,
@@ -130,7 +152,7 @@
   "txcount": 100,
 
   //show total sent & received on address page (set false if PoS)
-  "show_sent_received": true,
+  "show_sent_received": false,
 
   // how to calculate current coin supply
   // COINBASE : total sent from coinbase (PoW)
@@ -138,7 +160,7 @@
   // HEAVY: retreive from heavys getsupply api call
   // BALANCES : total of all address balances
   // TXOUTSET : retreive from gettxoutsetinfo api call
-  "supply": "COINBASE",
+  "supply": "BALANCES",
 
   // how to acquire network hashrate
   // getnetworkhashps: uses getnetworkhashps api call, returns in GH/s
@@ -150,12 +172,12 @@
   "nethash_units": "G",
 
   // Address labels
-  // example : "JhbrvAmM7kNpwA6wD5KoAsbtikLWWMNPcM": {"label": "This is a burn address", "type":"danger", "url":"http://example.com"}
+  // example : "D9uKDZxndukJsvNJxxU7bhi2fhXLZ7AhwQ": {"label": "This is a donation address", "type":"danger", "url":"https://dstra.io"}
   // label (required) = test to display
   // type (optional) = class of label, valid types: default, primary, warning, danger, success
   // url (optional) = url to link to for more information
   "labels": {
-  //  "JSoEdU717hvz8KQVq2HfcqV9A79Wihzusu": {"label": "Developers address", "type":"primary", "url":"http://example.com"},
-  //  "JSWVXHWeYNknPdG9uDrcBoZHztKMFCsndw": {"label": "Cryptsy"}
-  }
+    "ET57ghQJDd2vCsToAzTrZ21NUPHqZkDPKN": {"label": "Premine Address", "type":"primary", "url":"https://dstra.io"},
+    "DP7FPVeqbohMJTGpeMHf5U8hwaWQiRBxuA": {"label": "Another Sample Address", "type":"danger", "url":"https://dstra.io"}
+     }
 }

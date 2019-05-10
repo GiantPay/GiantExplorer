@@ -1,7 +1,7 @@
 var express = require('express')
   , path = require('path')
-  , bitcoinapi = require('bitcoin-node-api')
-  , favicon = require('static-favicon')
+  , chaincoinapi = require('chaincoin-node-api')
+  , favicon = require('serve-favicon')
   , logger = require('morgan')
   , cookieParser = require('cookie-parser')
   , bodyParser = require('body-parser')
@@ -9,16 +9,19 @@ var express = require('express')
   , routes = require('./routes/index')
   , lib = require('./lib/explorer')
   , db = require('./lib/database')
-  , locale = require('./lib/locale')
+  , i18next = require('i18next')
+  , i18nextMiddleware = require('i18next-express-middleware')
+  , i18Backend = require('i18next-node-fs-backend')
   , request = require('request');
 
 var app = express();
 
-// bitcoinapi
-bitcoinapi.setWalletDetails(settings.wallet);
+// chaincoinapi
+chaincoinapi.setWalletDetails(settings.wallet);
 if (settings.heavy != true) {
-  bitcoinapi.setAccess('only', ['getinfo', 'getnetworkhashps', 'getmininginfo','getdifficulty', 'getconnectioncount',
-    'getblockcount', 'getblockhash', 'getblock', 'getrawtransaction', 'getpeerinfo', 'gettxoutsetinfo']);
+  chaincoinapi.setAccess('only', ['getinfo', 'getnetworkhashps', 'getmininginfo','getdifficulty', 'getconnectioncount',
+  'getmasternodecount', 'getmasternodecountonline', 'getmasternodelist', 'getvotelist', 'getblockcount', 'getblockhash', 'getblock', 'getrawtransaction', 
+  'getpeerinfo', 'gettxoutsetinfo','listmasternodes']);
 } else {
   // enable additional heavy api calls
   /*
@@ -32,24 +35,70 @@ if (settings.heavy != true) {
     getsupply - Returns the current money supply.
     getmaxmoney - Returns the maximum possible money supply.
   */
-  bitcoinapi.setAccess('only', ['getinfo', 'getstakinginfo', 'getnetworkhashps', 'getdifficulty', 'getconnectioncount',
-    'getblockcount', 'getblockhash', 'getblock', 'getrawtransaction','getmaxmoney', 'getvote',
-    'getmaxvote', 'getphase', 'getreward', 'getnextrewardestimate', 'getnextrewardwhenstr',
-    'getnextrewardwhensec', 'getsupply', 'gettxoutsetinfo']);
+  chaincoinapi.setAccess('only', ['getinfo', 'getstakinginfo', 'getnetworkhashps', 'getdifficulty', 'getconnectioncount',
+    'getmasternodecount', 'getmasternodecountonline', 'getmasternodelist', 'getvotelist', 'getblockcount', 'getblockhash', 
+    'getblock', 'getrawtransaction', 'getmaxmoney', 'getvote', 'getmaxvote', 'getphase', 'getreward', 'getpeerinfo', 
+    'getnextrewardestimate', 'getnextrewardwhenstr', 'getnextrewardwhensec', 'getsupply', 'gettxoutsetinfo','listmasternodes']);
 }
+// Language setup
+i18next
+  .use(i18Backend)
+  .use(i18nextMiddleware.LanguageDetector)
+  .init({
+    interpolation: {
+      format: function(value, format, lng) {
+          if (format === 'uppercase') return value.toUpperCase();
+          if(value instanceof Date) return moment(value).format(format);
+          return value;
+        }
+    },
+    backend: {
+      loadPath: __dirname + '/locale/{{lng}}/{{ns}}.json',
+      addPath: __dirname + '/locale/{{lng}}/{{ns}}.missing.json'
+    },
+    detection: {
+      order: ['querystring', 'cookie'],
+      caches: ['cookie']
+    },
+   
+    fallbackLng: settings.language_fallback,
+    preload: settings.language,
+    saveMissing: true,
+    debug: false
+});
+
+
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'pug');
+app.use(i18nextMiddleware.handle(i18next));
 
 app.use(favicon(path.join(__dirname, settings.favicon)));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Add Languages to Local Variabels
+app.use(function (req, res, next) {
+  res.locals.currentlang = req.language;
+
+  next();
+})
+
+// Language Files for Datatable
+app.use('/datatable/lang', function(req,res){
+    i18next.changeLanguage(req.language, (err, t) => {
+      if (err) return console.log('something went wrong loading', err);
+      res.send(i18next.t("datatable", { returnObjects: true }));
+    });   
+});
+
+
 // routes
-app.use('/api', bitcoinapi.app);
+app.use('/api', chaincoinapi.app);
 app.use('/', routes);
 app.use('/ext/getmoneysupply', function(req,res){
   lib.get_supply(function(supply){
@@ -106,14 +155,28 @@ app.use('/ext/connections', function(req,res){
   });
 });
 
+//Masternodes 
+app.use('/ext/getmasternodes', function(req, res) {
+   db.get_masternodes(function(masternode){
+    res.send({data: masternode});
+   });
+});
+
 // locals
 app.set('title', settings.title);
 app.set('symbol', settings.symbol);
 app.set('coin', settings.coin);
-app.set('locale', locale);
+//app.set('locale', locale);
 app.set('display', settings.display);
 app.set('markets', settings.markets);
 app.set('twitter', settings.twitter);
+app.set('facebook', settings.facebook);
+app.set('googleplus', settings.googleplus);
+app.set('bitcointalk', settings.bitcointalk);
+app.set('slack', settings.slack);
+app.set('github', settings.github);
+app.set('discord', settings.discord);
+app.set('website', settings.website);
 app.set('genesis_block', settings.genesis_block);
 app.set('index', settings.index);
 app.set('heavy', settings.heavy);
@@ -124,6 +187,7 @@ app.set('show_sent_received', settings.show_sent_received);
 app.set('logo', settings.logo);
 app.set('theme', settings.theme);
 app.set('labels', settings.labels);
+app.set('languages', settings.languages);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

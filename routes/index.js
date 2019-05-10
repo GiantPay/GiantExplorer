@@ -1,7 +1,6 @@
 var express = require('express')
   , router = express.Router()
   , settings = require('../lib/settings')
-  , locale = require('../lib/locale')
   , db = require('../lib/database')
   , lib = require('../lib/explorer')
   , qr = require('qr-image');
@@ -137,7 +136,6 @@ router.get('/markets/:market', function(req, res) {
       /*if (market === 'bittrex') {
         data = JSON.parse(data);
       }*/
-      console.log(data);
       res.render('./markets/' + market, {
         active: 'markets',
         marketdata: {
@@ -194,6 +192,12 @@ router.get('/network', function(req, res) {
   res.render('network', {active: 'network'});
 });
 
+// Masternodelist
+router.get('/masternodes', function(req, res) {
+    res.render('masternodes', {active: 'masternodes'});
+});
+
+
 router.get('/reward', function(req, res){
   //db.get_stats(settings.coin, function (stats) {
     console.log(stats);
@@ -245,7 +249,7 @@ router.post('/search', function(req, res) {
             if (block != 'There was an error. Check your console.') {
               res.redirect('/block/' + query);
             } else {
-              route_get_index(res, locale.ex_search_error + query );
+              route_get_index(res, t('search.no_results',{query:query}));
             }
           });
         }
@@ -260,7 +264,7 @@ router.post('/search', function(req, res) {
           if (hash != 'There was an error. Check your console.') {
             res.redirect('/block/' + hash);
           } else {
-            route_get_index(res, locale.ex_search_error + query );
+            route_get_index(res, t('tsearch.no_results',{query:query}));
           }
         });
       }
@@ -296,20 +300,25 @@ router.get('/ext/summary', function(req, res) {
     }
     lib.get_hashrate(function(hashrate) {
       lib.get_connectioncount(function(connections){
-        lib.get_blockcount(function(blockcount) {
-          db.get_stats(settings.coin, function (stats) {
-            if (hashrate == 'There was an error. Check your console.') {
-              hashrate = 0;
-            }
-            res.send({ data: [{
-              difficulty: difficulty,
-              difficultyHybrid: difficultyHybrid,
-              supply: stats.supply,
-              hashrate: hashrate,
-              lastPrice: stats.last_price,
-              connections: connections,
-              blockcount: blockcount
-            }]});
+        lib.get_masternodecount(function(masternodestotal){
+            lib.get_blockcount(function(blockcount) {
+              db.get_stats(settings.coin, function (stats) {
+                if (hashrate == 'There was an error. Check your console.') {
+                  hashrate = 0;
+                }
+                var masternodesoffline = Math.floor(masternodestotal.total - masternodestotal.enabled);
+                res.send({ data: [{
+                  difficulty: difficulty,
+                  difficultyHybrid: difficultyHybrid,
+                  supply: stats.supply,
+                  hashrate: hashrate,
+                  lastPrice: stats.last_price,
+                  connections: connections,
+                  masternodeCountOnline: masternodestotal.enabled,
+                  masternodeCountOffline: masternodesoffline,
+                  blockcount: blockcount
+                }]});
+              });
           });
         });
       });

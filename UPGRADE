@@ -1,5 +1,22 @@
 Note: All updates require the explorer to be restarted
 
+1.7.0 -> 1.7.1
+* Added full masternodelist
+* Added masternode votes (undocumented)
+* Fixed missing getpeerinfo from heavy settings
+
+1.6.2 -> 1.7.0
+* Added master node count
+* Added chaincoin-json-api and node-chaincoin modules
+* added website link (see settings.json.template)
+* moved logo to api page
+
+1.6.1 -> 1.6.2
+* Added bitcointalk, slack, and github links (see settings.json.template)
+* Added super hacky forcesync scripts to enable syncing newest blocks during initial database sync
+* Fixed facebook and google plus buttons not loading from settings.json
+* Added some basic Chaincoin love
+
 1.6.0 -> 1.6.1
 * Add new cryptsy_id and hashrate_units settings (see settings.json.template)
 * remove tmp/market.pid (if it exists)

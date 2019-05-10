@@ -1,24 +1,20 @@
-Iquidus Explorer - 1.6.1
+Diquidus, a DSTRA (v2) Block Explorer - v1.0
 ================
 
-An open source block explorer written in node.js.
+The DSTRA block explorer.
+
+This project is a fork of [Iquidus Explorer](https://github.com/iquidus/explorer) so massive thanks go out to Luke Williams for his code. Further development was derived from [Ciquidus Explorer](https://github.com/suprnudr/ciquidus)! Thank you!!!
 
 ### See it in action
 
-*  [Jumbucks](http://explorer.getjumbucks.com)
-*  [Sphere](http://sphere.iquidus.io)
-*  [SAR](http://explorer.sarcoin.info)
-*  [Vanillacoin](https://blockchain.vanillacoin.net/)
-*  [Neoscoin](http://explorer.infernopool.com/)  
-*  [C2Chain](http://c2chain.info/)
+*  [explorer.dstra.io](https://explorer.dstra.io)
 
-*note: If you would like your instance mentioned here contact me*
 
 ### Requires
 
 *  node.js >= 0.10.28
 *  mongodb 2.6.x
-*  *coind
+*  dstrad, dstra-cli
 
 ### Create database
 
@@ -32,15 +28,15 @@ Create databse:
 
 Create user with read/write access:
 
-    > db.createUser( { user: "iquidus", pwd: "3xp!0reR", roles: [ "readWrite" ] } )
+    > db.createUser( { user: "diquidus", pwd: "dstra", roles: [ "readWrite" ] } )
 
 *note: If you're using mongo shell 2.4.x, use the following to create your user:
 
-    > db.addUser( { user: "username", pwd: "password", roles: [ "readWrite"] })
+    > db.addUser( { user: "diquidus", pwd: "dstra", roles: [ "readWrite"] })
 
 ### Get the source
 
-    git clone https://github.com/iquidus/explorer explorer
+    git clone https://github.com/DSTRACoin/diquidus explorer
 
 ### Install node modules
 
@@ -53,8 +49,10 @@ Create user with read/write access:
 *Make required changes in settings.json*
 
 ### Start Explorer
-
+    
     npm start
+    OR
+    forever start bin/cluster
 
 *note: mongod must be running to start the explorer*
 
@@ -65,6 +63,9 @@ As of version 1.4.0 the explorer defaults to cluster mode, forking an instance o
 To stop the cluster you can use
 
     npm stop
+    OR (use corresponding to above explorer start)
+    forever stop PID
+    while you need to search for the correct PID with 'forever list', usually it would be 'forever stop 0' if no other forever processes are running
 
 ### Syncing databases with the blockchain
 
@@ -96,20 +97,32 @@ sync.js (located in scripts/) is used for updating the local databases. This scr
 
     */1 * * * * cd /path/to/explorer && /usr/bin/nodejs scripts/sync.js index update > /dev/null 2>&1
     */2 * * * * cd /path/to/explorer && /usr/bin/nodejs scripts/sync.js market > /dev/null 2>&1
+    */2 * * * * cd /path/to/explorer && /usr/bin/nodejs scripts/masternodes.js > /dev/null 2>&1
     */5 * * * * cd /path/to/explorer && /usr/bin/nodejs scripts/peers.js > /dev/null 2>&1
+
+forcesync.sh and forcesynclatest.sh (located in scripts/) can be used to force the explorer to sync at the specified block heights
 
 ### Wallet
 
-Iquidus Explorer is intended to be generic so it can be used with any wallet following the usual standards. The wallet must be running with atleast the following flags
+The wallet connected to Diquidus must be running with atleast the following flags:
 
     -daemon -txindex
 
 ### Donate
-
-    BTC: 168hdKA3fkccPtkxnX8hBrsxNubvk4udJi
-    JBS: JZp9893FMmrm1681bDuJBU7c6w11kyEY7D
+    
+    DST: D9uKDZxndukJsvNJxxU7bhi2fhXLZ7AhwQ
+    BTC: 3LjfMHcNnUt46mbQifvHfLTUPQW583NV41
+    ETH: 0x550f1702477EcdB78E66a8B8eC963D23f3CC704c
 
 ### Known Issues
+**Database Querys are slow.**
+Index are not working correct you need to create the index in the mongodb
+
+    db.addresses.ensureIndex({"a_id":1})
+    db.getCollection('txes').ensureIndex({"txid":1})
+    db.getCollection('txes').ensureIndex({"timestamp":1})
+    db.txes.collection.createIndex( { timestamp: -1 } )
+    db.txes.ensureIndex({"total":1})
 
 **script is already running.**
 
@@ -137,6 +150,8 @@ Where [SIZE] is an integer higher than the default.
 
 ### License
 
+Copyright (c) 2018, DSTRA  
+Copyright (c) 2017, The Chaincoin Community  
 Copyright (c) 2015, Iquidus Technology  
 Copyright (c) 2015, Luke Williams  
 All rights reserved.

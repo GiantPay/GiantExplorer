@@ -1,6 +1,6 @@
 {
   "name": "explorer",
-  "version": "1.6.1",
+  "version": "1.7.1",
   "private": true,
   "scripts": {
     "start": "node --stack-size=10000 ./bin/cluster",
@@ -9,21 +9,23 @@
   },
   "dependencies": {
     "express": "~4.2.0",
-    "static-favicon": "~1.0.0",
-    "morgan": "~1.0.0",
-    "cookie-parser": "~1.0.1",
-    "body-parser": "~1.0.0",
+    "serve-favicon": "~2.5.0",
+    "morgan": "~1.9.0",
+    "cookie-parser": "~1.4.3",
+    "body-parser": "~1.18.3",
     "debug": "~0.7.4",
-    "jade": "~1.3.0",
-    "bitcoin-node-api": "0.1.0",
-    "request": "2.74.0",
-    "jsonminify": "0.2.3",
-    "mongodb": "2.0.45",
-    "mongoose": "4.1.10",
-    "markdown-js": "0.0.3",
-    "qr-image": "~2.0.0"
+    "pug": "~2.0.3",
+    "chaincoin-node-api": "1.0.4",
+    "request": "2.87.0",
+    "jsonminify": "0.4.1",
+    "mongodb": "3.1.1",
+    "mongoose": "5.2.3",
+    "qr-image": "~2.0.0",
+    "i18next": "*",
+    "i18next-express-middleware": "1.0.5",
+    "i18next-node-fs-backend": "1.0.0"
   },
   "devDependencies": {
-    "jasmine": "~2.1.0"
+    "jasmine": "~3.1.0"
   }
 }
